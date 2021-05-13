@@ -1,10 +1,11 @@
 import Puzzle from './Components/Puzzle/Puzzle'
+import Puzzle2 from './Components/Puzzle2/Puzzle2'
 import './App.css';
 
 function App() {
   return (
     <div id="app-container">
-      <Puzzle />
+      <Puzzle2 />
     </div>
   );
 }
