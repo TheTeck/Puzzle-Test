@@ -6,7 +6,7 @@ export default function Puzzle2 () {
 
     const puzzleImage = 'images/radagast.png'
     const puzzleDim = [ 584, 469 ]
-    const pieceSize = 40
+    const pieceSize = 100
 
     const [ xCount, setXCount ] = useState(Math.floor(puzzleDim[0] / pieceSize))
     const [ yCount, setYCount ] = useState(Math.floor(puzzleDim[1] / pieceSize))
@@ -14,10 +14,41 @@ export default function Puzzle2 () {
     const [ thePuzzle, setThePuzzle ] = useState([])
     const [ force, setForce ] = useState(false)
 
+    // Look for a connection between pieces
+    function checkConnection () {
+        let outputX = thePuzzle[currentActive].xLoc
+        let outputY = thePuzzle[currentActive].yLoc
+
+        // Check if piece above active piece is in range and snap to it
+        if (thePuzzle[currentActive].y !== 0 && !thePuzzle[currentActive].connected.includes(currentActive - xCount)) {
+            if (Math.abs(thePuzzle[currentActive].yLoc - (thePuzzle[currentActive-xCount].yLoc + pieceSize)) < 15
+                && Math.abs(thePuzzle[currentActive].xLoc - (thePuzzle[currentActive-xCount].xLoc)) < 15) {
+                outputX = thePuzzle[currentActive-xCount].xLoc
+                outputY = thePuzzle[currentActive-xCount].yLoc + pieceSize
+                return [ outputX, outputY ]
+            }
+        }
+        // Check if piece to the left of the active piece is in range and snap to it
+        if (thePuzzle[currentActive].x !== 0 && !thePuzzle[currentActive].connected.includes(currentActive - 1)) {
+            if (Math.abs(thePuzzle[currentActive].xLoc - (thePuzzle[currentActive-1].xLoc + pieceSize)) < 15
+                && Math.abs(thePuzzle[currentActive].yLoc - (thePuzzle[currentActive-1].yLoc)) < 15) {
+                outputX = thePuzzle[currentActive-1].xLoc + pieceSize
+                outputY = thePuzzle[currentActive-1].yLoc
+                return [ outputX, outputY ]
+            }
+        }
+
+
+        return [ outputX, outputY ]
+    }
+
     function setActive(e) {
         if (currentActive) {
             const temp = thePuzzle
+            const locs = checkConnection()
             temp[currentActive].z = 1
+            temp[currentActive].xLoc = locs[0]
+            temp[currentActive].yLoc = locs[1]
             setThePuzzle(temp)
             setCurrentActive(null)
         } else {
@@ -47,7 +78,8 @@ export default function Puzzle2 () {
                         y: y,
                         z: 1,
                         xLoc: x * pieceSize,
-                        yLoc: y * pieceSize
+                        yLoc: y * pieceSize,
+                        connected: []
                     }
                 )
             }
