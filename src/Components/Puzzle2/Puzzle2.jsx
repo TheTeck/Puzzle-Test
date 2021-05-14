@@ -37,7 +37,24 @@ export default function Puzzle2 () {
                 return [ outputX, outputY ]
             }
         }
-
+        // Check if piece below active piece is in range and snap to it
+        if (thePuzzle[currentActive].y !== yCount-1 && !thePuzzle[currentActive].connected.includes(currentActive + xCount)) {
+            if (Math.abs(thePuzzle[currentActive].yLoc - (thePuzzle[currentActive+xCount].yLoc - pieceSize)) < 15
+                && Math.abs(thePuzzle[currentActive].xLoc - (thePuzzle[currentActive+xCount].xLoc)) < 15) {
+                outputX = thePuzzle[currentActive+xCount].xLoc
+                outputY = thePuzzle[currentActive+xCount].yLoc - pieceSize
+                return [ outputX, outputY ]
+            }
+        }
+        // Check if piece to the right of the active piece is in range and snap to it
+        if (thePuzzle[currentActive].x !== xCount-1 && !thePuzzle[currentActive].connected.includes(currentActive + 1)) {
+            if (Math.abs(thePuzzle[currentActive].xLoc - (thePuzzle[currentActive+1].xLoc - pieceSize)) < 15
+                && Math.abs(thePuzzle[currentActive].yLoc - (thePuzzle[currentActive+1].yLoc)) < 15) {
+                outputX = thePuzzle[currentActive+1].xLoc - pieceSize
+                outputY = thePuzzle[currentActive+1].yLoc
+                return [ outputX, outputY ]
+            }
+        }
 
         return [ outputX, outputY ]
     }
@@ -53,7 +70,7 @@ export default function Puzzle2 () {
             setCurrentActive(null)
         } else {
             if (e.target.id >= 0 && e.target.id < yCount * xCount)
-                setCurrentActive(e.target.id)
+                setCurrentActive(+e.target.id)
         }
     }
 
