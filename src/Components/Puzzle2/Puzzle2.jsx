@@ -13,6 +13,7 @@ export default function Puzzle2 () {
     const [ currentActive, setCurrentActive ] = useState(null)
     const [ thePuzzle, setThePuzzle ] = useState([])
     const [ force, setForce ] = useState(false)
+    const [ puzzleDone, setPuzzleDone ] = useState(false)
 
     // Add all connected pieces to each other's connected array property
     function bindPieces (piece, otherPiece) {
@@ -21,6 +22,8 @@ export default function Puzzle2 () {
         const temp = thePuzzle
         thePuzzle[piece].connected.forEach(connectedPiece => {
             temp[connectedPiece].connected = [...allUniqueConnected]
+            temp[connectedPiece].xLoc = thePuzzle[otherPiece].xLoc + (thePuzzle[connectedPiece].x - thePuzzle[otherPiece].x) * pieceSize
+            temp[connectedPiece].yLoc = thePuzzle[otherPiece].yLoc + (thePuzzle[connectedPiece].y - thePuzzle[otherPiece].y) * pieceSize
         })
         thePuzzle[otherPiece].connected.forEach(connectedPiece => {
             temp[connectedPiece].connected = [...allUniqueConnected]
@@ -88,6 +91,9 @@ export default function Puzzle2 () {
             })
             setThePuzzle(temp)
             setCurrentActive(null)
+            if (temp[currentActive].connected.length === thePuzzle.length) {
+                setPuzzleDone(true)
+            }
         } else {
             if (e.target.id >= 0 && e.target.id < yCount * xCount)
                 setCurrentActive(+e.target.id)
@@ -137,24 +143,29 @@ export default function Puzzle2 () {
     }, [])
 
     return (
-        <div id="puzzle2-container" onClick={setActive} onMouseMove={movePiece} >
+        <>
+            <div id="puzzle2-container" onClick={setActive} onMouseMove={movePiece} >
+                {
+                    thePuzzle.map((piece, index) => {
+                        return (
+                            <Piece2 
+                                key={index}
+                                image={puzzleImage}
+                                xLoc={piece.xLoc}
+                                yLoc={piece.yLoc}
+                                size={pieceSize}
+                                xImg={piece.x}
+                                yImg={piece.y}
+                                id={index}
+                                z={piece.z}
+                            />
+                        )
+                    })
+                }
+            </div>
             {
-                thePuzzle.map((piece, index) => {
-                    return (
-                        <Piece2 
-                            key={index}
-                            image={puzzleImage}
-                            xLoc={piece.xLoc}
-                            yLoc={piece.yLoc}
-                            size={pieceSize}
-                            xImg={piece.x}
-                            yImg={piece.y}
-                            id={index}
-                            z={piece.z}
-                        />
-                    )
-                })
+                puzzleDone ? <p>Puzzle is complete!</p> : ''
             }
-        </div>
+        </>
     )
 }
