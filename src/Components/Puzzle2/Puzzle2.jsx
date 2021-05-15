@@ -8,6 +8,8 @@ export default function Puzzle2 () {
     const puzzleDim = [ 584, 469 ]
     const pieceSize = 100
 
+    const snap = new Audio('snap.mp3')
+
     const [ xCount, setXCount ] = useState(Math.floor(puzzleDim[0] / pieceSize))
     const [ yCount, setYCount ] = useState(Math.floor(puzzleDim[1] / pieceSize))
     const [ currentActive, setCurrentActive ] = useState(null)
@@ -28,6 +30,7 @@ export default function Puzzle2 () {
         thePuzzle[otherPiece].connected.forEach(connectedPiece => {
             temp[connectedPiece].connected = [...allUniqueConnected]
         })
+        snap.play()
         setThePuzzle(temp)
     }
 
