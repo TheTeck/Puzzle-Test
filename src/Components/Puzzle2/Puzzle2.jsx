@@ -135,8 +135,8 @@ export default function Puzzle2 () {
                         x: x,
                         y: y,
                         z: 1,
-                        xLoc: x * pieceSize,
-                        yLoc: y * pieceSize,
+                        xLoc: Math.floor(Math.random() * (window.innerWidth - pieceSize)),
+                        yLoc: Math.floor(Math.random() * (window.innerHeight - pieceSize)),
                         connected: [ xCount * y + x]
                     }
                 )
@@ -151,7 +151,7 @@ export default function Puzzle2 () {
                 {
                     thePuzzle.map((piece, index) => {
                         return (
-                            <Piece2 
+                            /* <Piece2 
                                 key={index}
                                 image={puzzleImage}
                                 xLoc={piece.xLoc}
@@ -161,6 +161,13 @@ export default function Puzzle2 () {
                                 yImg={piece.y}
                                 id={index}
                                 z={piece.z}
+                            /> */
+                            <Piece2 
+                                key={index}
+                                piece={piece}
+                                image={puzzleImage}
+                                id={index}
+                                size={pieceSize}
                             />
                         )
                     })
