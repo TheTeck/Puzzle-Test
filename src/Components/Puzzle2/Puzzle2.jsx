@@ -14,6 +14,16 @@ export default function Puzzle2 () {
     const [ thePuzzle, setThePuzzle ] = useState([])
     const [ force, setForce ] = useState(false)
 
+    // Add all connected pieces to each other's connected array property
+    function bindPieces (otherPiece) {
+        const allConnected = [ currentActive, otherPiece, ...thePuzzle[currentActive].connected, ...thePuzzle[otherPiece].connected ]
+        const allUniqueConnected = [...new Set(allConnected)]
+        const temp = thePuzzle
+        temp[currentActive].connected = [...allUniqueConnected]
+        temp[otherPiece].connected = [...allUniqueConnected]
+        setThePuzzle(temp)
+    }
+
     // Look for a connection between pieces
     function checkConnection () {
         let outputX = thePuzzle[currentActive].xLoc
@@ -25,6 +35,7 @@ export default function Puzzle2 () {
                 && Math.abs(thePuzzle[currentActive].xLoc - (thePuzzle[currentActive-xCount].xLoc)) < 15) {
                 outputX = thePuzzle[currentActive-xCount].xLoc
                 outputY = thePuzzle[currentActive-xCount].yLoc + pieceSize
+                bindPieces(currentActive-xCount)
                 return [ outputX, outputY ]
             }
         }
@@ -34,6 +45,7 @@ export default function Puzzle2 () {
                 && Math.abs(thePuzzle[currentActive].yLoc - (thePuzzle[currentActive-1].yLoc)) < 15) {
                 outputX = thePuzzle[currentActive-1].xLoc + pieceSize
                 outputY = thePuzzle[currentActive-1].yLoc
+                bindPieces(currentActive-1)
                 return [ outputX, outputY ]
             }
         }
@@ -43,6 +55,7 @@ export default function Puzzle2 () {
                 && Math.abs(thePuzzle[currentActive].xLoc - (thePuzzle[currentActive+xCount].xLoc)) < 15) {
                 outputX = thePuzzle[currentActive+xCount].xLoc
                 outputY = thePuzzle[currentActive+xCount].yLoc - pieceSize
+                bindPieces(currentActive+xCount)
                 return [ outputX, outputY ]
             }
         }
@@ -52,6 +65,7 @@ export default function Puzzle2 () {
                 && Math.abs(thePuzzle[currentActive].yLoc - (thePuzzle[currentActive+1].yLoc)) < 15) {
                 outputX = thePuzzle[currentActive+1].xLoc - pieceSize
                 outputY = thePuzzle[currentActive+1].yLoc
+                bindPieces(currentActive+1)
                 return [ outputX, outputY ]
             }
         }
@@ -60,7 +74,7 @@ export default function Puzzle2 () {
     }
 
     function setActive(e) {
-        if (currentActive) {
+        if (currentActive !== null) {
             const temp = thePuzzle
             const locs = checkConnection()
             temp[currentActive].z = 1
@@ -75,7 +89,7 @@ export default function Puzzle2 () {
     }
 
     function movePiece(e) {
-        if (currentActive) {
+        if (currentActive !== null) {
             const temp = thePuzzle
             temp[currentActive].xLoc = e.clientX - pieceSize / 2
             temp[currentActive].yLoc = e.clientY - pieceSize / 2
