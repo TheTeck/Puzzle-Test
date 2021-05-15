@@ -15,57 +15,61 @@ export default function Puzzle2 () {
     const [ force, setForce ] = useState(false)
 
     // Add all connected pieces to each other's connected array property
-    function bindPieces (otherPiece) {
-        const allConnected = [ currentActive, otherPiece, ...thePuzzle[currentActive].connected, ...thePuzzle[otherPiece].connected ]
+    function bindPieces (piece, otherPiece) {
+        const allConnected = [ ...thePuzzle[piece].connected, ...thePuzzle[otherPiece].connected ]
         const allUniqueConnected = [...new Set(allConnected)]
         const temp = thePuzzle
-        temp[currentActive].connected = [...allUniqueConnected]
-        temp[otherPiece].connected = [...allUniqueConnected]
+        thePuzzle[piece].connected.forEach(connectedPiece => {
+            temp[connectedPiece].connected = [...allUniqueConnected]
+        })
+        thePuzzle[otherPiece].connected.forEach(connectedPiece => {
+            temp[connectedPiece].connected = [...allUniqueConnected]
+        })
         setThePuzzle(temp)
     }
 
     // Look for a connection between pieces
-    function checkConnection () {
-        let outputX = thePuzzle[currentActive].xLoc
-        let outputY = thePuzzle[currentActive].yLoc
+    function checkConnection (piece) {
+        let outputX = thePuzzle[piece].xLoc
+        let outputY = thePuzzle[piece].yLoc
 
         // Check if piece above active piece is in range and snap to it
-        if (thePuzzle[currentActive].y !== 0 && !thePuzzle[currentActive].connected.includes(currentActive - xCount)) {
-            if (Math.abs(thePuzzle[currentActive].yLoc - (thePuzzle[currentActive-xCount].yLoc + pieceSize)) < 15
-                && Math.abs(thePuzzle[currentActive].xLoc - (thePuzzle[currentActive-xCount].xLoc)) < 15) {
-                outputX = thePuzzle[currentActive-xCount].xLoc
-                outputY = thePuzzle[currentActive-xCount].yLoc + pieceSize
-                bindPieces(currentActive-xCount)
+        if (thePuzzle[piece].y !== 0 && !thePuzzle[piece].connected.includes(piece - xCount)) {
+            if (Math.abs(thePuzzle[piece].yLoc - (thePuzzle[piece-xCount].yLoc + pieceSize)) < 15
+                && Math.abs(thePuzzle[piece].xLoc - (thePuzzle[piece-xCount].xLoc)) < 15) {
+                outputX = thePuzzle[piece-xCount].xLoc
+                outputY = thePuzzle[piece-xCount].yLoc + pieceSize
+                bindPieces(piece, piece-xCount)
                 return [ outputX, outputY ]
             }
         }
         // Check if piece to the left of the active piece is in range and snap to it
-        if (thePuzzle[currentActive].x !== 0 && !thePuzzle[currentActive].connected.includes(currentActive - 1)) {
-            if (Math.abs(thePuzzle[currentActive].xLoc - (thePuzzle[currentActive-1].xLoc + pieceSize)) < 15
-                && Math.abs(thePuzzle[currentActive].yLoc - (thePuzzle[currentActive-1].yLoc)) < 15) {
-                outputX = thePuzzle[currentActive-1].xLoc + pieceSize
-                outputY = thePuzzle[currentActive-1].yLoc
-                bindPieces(currentActive-1)
+        if (thePuzzle[piece].x !== 0 && !thePuzzle[piece].connected.includes(piece - 1)) {
+            if (Math.abs(thePuzzle[piece].xLoc - (thePuzzle[piece-1].xLoc + pieceSize)) < 15
+                && Math.abs(thePuzzle[piece].yLoc - (thePuzzle[piece-1].yLoc)) < 15) {
+                outputX = thePuzzle[piece-1].xLoc + pieceSize
+                outputY = thePuzzle[piece-1].yLoc
+                bindPieces(piece, piece-1)
                 return [ outputX, outputY ]
             }
         }
         // Check if piece below active piece is in range and snap to it
-        if (thePuzzle[currentActive].y !== yCount-1 && !thePuzzle[currentActive].connected.includes(currentActive + xCount)) {
-            if (Math.abs(thePuzzle[currentActive].yLoc - (thePuzzle[currentActive+xCount].yLoc - pieceSize)) < 15
-                && Math.abs(thePuzzle[currentActive].xLoc - (thePuzzle[currentActive+xCount].xLoc)) < 15) {
-                outputX = thePuzzle[currentActive+xCount].xLoc
-                outputY = thePuzzle[currentActive+xCount].yLoc - pieceSize
-                bindPieces(currentActive+xCount)
+        if (thePuzzle[piece].y !== yCount-1 && !thePuzzle[piece].connected.includes(piece + xCount)) {
+            if (Math.abs(thePuzzle[piece].yLoc - (thePuzzle[piece+xCount].yLoc - pieceSize)) < 15
+                && Math.abs(thePuzzle[piece].xLoc - (thePuzzle[piece+xCount].xLoc)) < 15) {
+                outputX = thePuzzle[piece+xCount].xLoc
+                outputY = thePuzzle[piece+xCount].yLoc - pieceSize
+                bindPieces(piece, piece+xCount)
                 return [ outputX, outputY ]
             }
         }
         // Check if piece to the right of the active piece is in range and snap to it
-        if (thePuzzle[currentActive].x !== xCount-1 && !thePuzzle[currentActive].connected.includes(currentActive + 1)) {
-            if (Math.abs(thePuzzle[currentActive].xLoc - (thePuzzle[currentActive+1].xLoc - pieceSize)) < 15
-                && Math.abs(thePuzzle[currentActive].yLoc - (thePuzzle[currentActive+1].yLoc)) < 15) {
-                outputX = thePuzzle[currentActive+1].xLoc - pieceSize
-                outputY = thePuzzle[currentActive+1].yLoc
-                bindPieces(currentActive+1)
+        if (thePuzzle[piece].x !== xCount-1 && !thePuzzle[piece].connected.includes(piece + 1)) {
+            if (Math.abs(thePuzzle[piece].xLoc - (thePuzzle[piece+1].xLoc - pieceSize)) < 15
+                && Math.abs(thePuzzle[piece].yLoc - (thePuzzle[piece+1].yLoc)) < 15) {
+                outputX = thePuzzle[piece+1].xLoc - pieceSize
+                outputY = thePuzzle[piece+1].yLoc
+                bindPieces(piece, piece+1)
                 return [ outputX, outputY ]
             }
         }
@@ -76,10 +80,12 @@ export default function Puzzle2 () {
     function setActive(e) {
         if (currentActive !== null) {
             const temp = thePuzzle
-            const locs = checkConnection()
-            temp[currentActive].z = 1
-            temp[currentActive].xLoc = locs[0]
-            temp[currentActive].yLoc = locs[1]
+            temp[currentActive].connected.forEach(piece => {
+                let locs = checkConnection(piece)
+                temp[piece].z = 1
+                temp[piece].xLoc = locs[0]
+                temp[piece].yLoc = locs[1]
+            })
             setThePuzzle(temp)
             setCurrentActive(null)
         } else {
@@ -91,12 +97,24 @@ export default function Puzzle2 () {
     function movePiece(e) {
         if (currentActive !== null) {
             const temp = thePuzzle
-            temp[currentActive].xLoc = e.clientX - pieceSize / 2
-            temp[currentActive].yLoc = e.clientY - pieceSize / 2
             temp[currentActive].z = 2
+            temp[currentActive].xLoc = updatePieceXLocation(e.clientX, currentActive)
+            temp[currentActive].yLoc = updatePieceYLocation(e.clientY, currentActive)
+            for (let connection of temp[currentActive].connected) {
+                temp[connection].xLoc = updatePieceXLocation(e.clientX, connection)
+                temp[connection].yLoc = updatePieceYLocation(e.clientY, connection)
+            }
             setThePuzzle(temp)
             setForce(!force)
         }
+    }
+
+    function updatePieceXLocation(mouseX, piece) {
+        return (thePuzzle[piece].x - thePuzzle[currentActive].x) * pieceSize + mouseX - pieceSize / 2
+    }
+
+    function updatePieceYLocation(mouseY, piece) {
+        return (thePuzzle[piece].y - thePuzzle[currentActive].y) * pieceSize + mouseY - pieceSize / 2
     }
 
     useEffect(() => {
@@ -110,7 +128,7 @@ export default function Puzzle2 () {
                         z: 1,
                         xLoc: x * pieceSize,
                         yLoc: y * pieceSize,
-                        connected: []
+                        connected: [ xCount * y + x]
                     }
                 )
             }
